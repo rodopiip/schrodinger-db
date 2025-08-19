@@ -39,7 +39,6 @@ func connectToDB(host string, port string, user string, password string, dbName 
 	if err != nil {
 		panic(err)
 	}
-	defer db.Close()
 	//Verify connection
 	err = db.Ping()
 	if err != nil {
@@ -49,6 +48,10 @@ func connectToDB(host string, port string, user string, password string, dbName 
 	return db
 }
 
+func closeDB(db *sql.DB) { //todo -> when do I close the db connection?
+	db.Close()
+}
+
 /*
 Basic Key-Value Store:
 - Put(key, value) → Stores data.
@@ -56,12 +59,30 @@ Basic Key-Value Store:
 - Delete(key) → Removes data.
 */
 
-func storeData(key string, value string, db *sql.DB) {
+func storeData(key string, value string, db *sql.DB) error {
 	//PUT
+	_, err := db.Exec(`
+		CREATE TABLE IF NOT EXISTS key_value_table (
+		    key VARCHAR(255) PRIMARY KEY, 
+		    value TEXT NOT NULL
+		                                           )
+		                                           `)
+	if err != nil {
+		return fmt.Errorf("error creating table: %s", err)
+	}
+	//todo -> do I need to check if an identical key already exists in the database,
+	//		or is it already handled by the "PRIMARY" key word in the SQL statement?
+	_, err = db.Exec(`INSERT INTO key_value_table (key, value) VALUES ($1, $2)`, key, value)
+	if err != nil {
+		return fmt.Errorf("error inserting data: %s", err)
+	}
+	return nil
 }
 
-func retrieveData(key string, db *sql.DB) {
+func retrieveData(key string, db *sql.DB) (error, string) {
 	//GET
+	_, err := db.Query("SELECT value FROM key_value_table WHERE key = $1", key)
+	return err, "string"
 }
 
 func removeData(key string, db *sql.DB) {
