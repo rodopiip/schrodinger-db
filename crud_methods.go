@@ -9,19 +9,14 @@ import (
 
 func storeData(key string, value string, db *sql.DB) error {
 	//PUT
-	_, err := db.Exec(`
-		CREATE TABLE IF NOT EXISTS key_value_table (
-		    key VARCHAR(255) PRIMARY KEY, 
-		    value TEXT NOT NULL
-		                                           )
-		                                           `)
+	_, err := db.Exec(CreateTableSQL)
 	if err != nil {
 		//fmt.Printf("error creating table: %s", err)
 		return fmt.Errorf("error creating table: %s", err)
 	}
 	//todo -> do I need to check if an identical key already exists in the database,
 	//		or is it already handled by the "PRIMARY" key word in the SQL statement? -> DONE
-	_, err = db.Exec(`INSERT INTO key_value_table (key, value) VALUES ($1, $2)`, key, value)
+	_, err = db.Exec(InsertSQL, key, value)
 	if err != nil {
 		var pqErr *pq.Error
 		if errors.As(err, &pqErr) && pqErr.Code == "23505" { //todo -> solve wrapped errors issue -> DONE
@@ -33,28 +28,28 @@ func storeData(key string, value string, db *sql.DB) error {
 	}
 	fmt.Println("Data stored successfully for key " + key)
 	return nil
-	//todo -> test
+	//todo -> test -> DONE
 }
 
-func retrieveData(key string, db *sql.DB) (error, string) {
+func retrieveData(db *sql.DB, query string, args ...interface{}) (error, string) {
 	//GET
 	var value string
-	err := db.QueryRow("SELECT value FROM key_value_table WHERE key = $1", key).Scan(&value)
+	err := db.QueryRow(query, args...).Scan(&value)
 	if errors.Is(err, sql.ErrNoRows) { //todo -> solve "Comparison with errors using equality operators fails on wrapped errors" -> DONE
 		//fmt.Printf("No data found for key: %s", key)
-		return err, fmt.Sprintf("No data found for key: %s", key)
+		return err, fmt.Sprintf("No data found for key: %s", args...)
 	} else if err != nil {
 		//fmt.Printf("Error retrieving data: %s", err)
 		return err, fmt.Sprintf("Error retrieving data: %s", err)
 	}
-	fmt.Println("Data retrieved successfully for key " + key + ": " + value)
+	//fmt.Println("Data retrieved successfully for key " + args... + ": " + value)//todo -> address 'args...' issue
 	return err, value
 	//todo -> test -> DONE
 }
 
-func removeData(key string, db *sql.DB) error {
+func removeData(db *sql.DB, key string) error {
 	//DELETE
-	result, err := db.Exec("DELETE FROM key_value_table WHERE key = $1", key)
+	result, err := db.Exec(DeleteSQL, key)
 	if err != nil {
 		//fmt.Printf("error deleting data: %s", err)
 		return fmt.Errorf("error deleting data: %s", err)
@@ -69,8 +64,19 @@ func removeData(key string, db *sql.DB) error {
 	//todo -> test -> DONE
 }
 
+func getRandomKey(db *sql.DB) (string, error) {
+	var key string
+	err := db.QueryRow(SelectRandomKeySQL).Scan(&key)
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", fmt.Errorf("no data found in table (table might be empty)")
+	} else if err != nil {
+		return "", fmt.Errorf("error retrieving random key: %s", err)
+	}
+	return key, nil
+}
+
 func dump(db *sql.DB) error {
-	rows, err := db.Query("SELECT key, value FROM key_value_table")
+	rows, err := db.Query(SelectAllSQL)
 	if err != nil {
 		//fmt.Printf("error querying data: %s", err)
 		return fmt.Errorf("error querying data: %s", err)
