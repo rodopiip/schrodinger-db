@@ -42,7 +42,7 @@ func retrieveData(db *sql.DB, query string, args ...interface{}) (error, string)
 		//fmt.Printf("Error retrieving data: %s", err)
 		return err, fmt.Sprintf("Error retrieving data: %s", err)
 	}
-	//fmt.Println("Data retrieved successfully for key " + args... + ": " + value)//todo -> address 'args...' issue
+	fmt.Printf("Data retrieved successfully for %v: %v\n", args, value) //todo -> address 'args...' issue
 	return err, value
 	//todo -> test -> DONE
 }
@@ -83,7 +83,7 @@ func dump(db *sql.DB) error {
 	}
 	defer rows.Close() //todo -> do I need to handle an error?
 
-	fmt.Println("Database contents:")
+	fmt.Println("======DATABASE DUMP======")
 	for rows.Next() { //todo -> do the rows have to be closed after iteration (closing the channel)?
 		var key, value string
 		if err := rows.Scan(&key, &value); err != nil {
