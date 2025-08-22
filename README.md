@@ -40,3 +40,10 @@ go run . --help
 ```
 ### CLI Showcase
 ![img.png](img.png)
+
+## Unit Tests
+```bash
+# Run unit tests
+
+go test .
+```

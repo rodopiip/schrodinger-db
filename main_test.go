@@ -10,22 +10,6 @@ import (
 	_ "testing"
 )
 
-//func TestHelloWorld(t *testing.T) {
-//	assert.True(t, true)
-//}
-
-/*
-func retrieveSchrodingerData(db *sql.DB, randomGenerator RandomNumbersGenerator, args ...interface{}) (error, string) {
-	if randomGenerator.Random() > 0.3 {
-		fmt.Println("...Non-random data is attempted to be retrieved...")
-		return retrieveData(db, SelectByKeySQL, args...)
-	} else {
-		fmt.Println("...Random data is attempted to be retrieved...")
-		return retrieveData(db, SelectByRandomKeySQL)
-	}
-}
-*/
-
 func TestRetrieveSchrodingerDataRandomKey(t *testing.T) {
 	mockRandomGenerator := &MockRandomNumbersGenerator{}
 	mockRandomGenerator.value = 0.2
