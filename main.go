@@ -74,33 +74,10 @@ func main() {
 	singleton := App{}
 	host, port, user, password, dbName := getEnvVar()
 	singleton.dbConn = connectToDB(host, port, user, password, dbName)
-	/*
-		// Define a helper function to handle errors
-		handleError := func(operation string, err error) {
-			if err != nil {
-				log.Printf("Error during %s: %v", operation, err)
-			}
+	defer func() {
+		if err := closeDB(singleton.dbConn); err != nil {
+			fmt.Fprintf(os.Stderr, "Error closing database: %v\n", err)
 		}
-
-		// Use the helper with each operation
-		handleError("storing peach", storeSchrodingerData("peach", "this peach is red", singleton.dbConn))
-		handleError("storing apple", storeSchrodingerData("apple", "the apple is tasty", singleton.dbConn))
-		handleError("storing walnut", storeSchrodingerData("walnut", "this walnut is tasty", singleton.dbConn))
-		handleError("storing cherry", storeSchrodingerData("cherry", "this cherry is red", singleton.dbConn))
-		handleError("storing watermelon", storeSchrodingerData("watermelon", "this watermelon is ripe", singleton.dbConn))
-	*/
-	err := storeSchrodingerData("peach", "this peach is red", singleton.dbConn)
-	//err, value := retrieveSchrodingerData(singleton.dbConn, "peach")
-	if err != nil {
-		log.Printf("Error: %v", err)
-	} else {
-		fmt.Printf("Success")
-	}
-	/*
-		handleError("removing peach", removeSchrodingerData(singleton.dbConn, "peach"))
-		handleError("dumping database", dump(singleton.dbConn))
-	*/
-	if err := closeDB(singleton.dbConn); err != nil {
-		log.Printf("Error during database closure: %v", err)
-	}
+	}()
+	InitCobraCLI(singleton.dbConn)
 }
