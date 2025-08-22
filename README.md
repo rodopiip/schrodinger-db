@@ -38,3 +38,5 @@ go run . dump
 go run . --help
 
 ```
+### CLI Showcase
+![img.png](img.png)
