@@ -1,4 +1,4 @@
-# Schrödinger's Database 🐱📦
+# Schrödinger's Database
 
 A key-value store built in Go that **randomly breaks** — sometimes returning the wrong data or failing mysteriously. 
 
