@@ -1,0 +1,10 @@
+.env
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+schrodinger-db
+notes.txt
+zota_assignment.txt
+zota_dev_task_go.pdf

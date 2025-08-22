@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:latest
+    container_name: schrodinger-postgres
+    environment:
+      POSTGRES_USER: maria
+      POSTGRES_PASSWORD: 5432
+      POSTGRES_DB: schrodingerdatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U maria -d schrodingerdatabase"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: schrodinger-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - HOST=db
+      - PORT=5432
+      - USER=maria
+      - PASSWORD=5432
+      - DB_NAME=schrodingerdatabase
+
+volumes:
+  postgres_data:
