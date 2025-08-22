@@ -4,21 +4,23 @@ A key-value store built in Go that **randomly breaks** — sometimes returning t
 
 ## Features
 - Store, retrieve, and delete key-value pairs.
-- List all stored pairs.
+- List all stored key-value pairs.
 - Randomized behavior to mimic "unstable" database responses.
 - Simple CLI powered by [Cobra](https://github.com/spf13/cobra).
 - PostgreSQL backend connection with `.env` configuration.
 
 ## Installation
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/rodopiip/schrodinger-db.git
 
 cd <repo-folder>
 
-go build -o schrodinger
+docker build -t schrodinger-db .
+
+docker run -it --rm schrodinger-db
 ```
 
-## Commands
+## Shcrodinger CLI Commands
 ```bash
 # Store a value
 go run . put mykey myvalue
