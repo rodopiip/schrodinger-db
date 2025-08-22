@@ -9,6 +9,49 @@ A key-value store built in Go that **randomly breaks** — sometimes returning t
 - Simple CLI powered by [Cobra](https://github.com/spf13/cobra).
 - PostgreSQL backend connection with `.env` configuration.
 
+## Design Approach
+- Go app provides a CLI interface.
+- Go app connects to database - 30% of statements do not output user-expected behaviour. Instead, app works with random rows/requests silently fail.
+- Unit test completed via mocking and dependency injection.
+
+## Design Diagram
+
+```
++-------------------+
+|      User         |
++--------+----------+
+         |
+         v
++-------------------+
+|      CLI          |  (Cobra commands: put/get/del/dump)
++--------+----------+
+         |
+         v
++-------------------+
+|   SchrodingerCLI  |  (Holds DB connection and RandomNumbersGenerator)
++--------+----------+
+         |
+         v
++-------------------+
+| Schrodinger CRUD  |  (storeSchrodingerData, retrieveSchrodingerData, removeSchrodingerData)
+|   Methods         |  - Receives DB and RandomNumbersGenerator as arguments
++--------+----------+
+         |
+         v
++-------------------+
+|   CRUD Methods    |  (storeData, retrieveData, removeData, dump)
+|   (DB logic)      |  - Interacts with PostgreSQL
++--------+----------+
+         |
+         v
++-------------------+
+|   PostgreSQL DB   |
++-------------------+
+```
+Dependency Injection for Testing
+- RandomNumbersGenerator is injected (real or mock)
+- DB is injected (real or `sqlmock` in tests)
+
 ## Installation
 ```bash
 git clone https://github.com/rodopiip/schrodinger-db.git
@@ -54,3 +97,8 @@ go run . --help
 
 go test .
 ```
+## Design Approach
+Go app provides a CLI interface.
+Go app connects to database - 30% of statements do not execute user-expected behavour. Instead work with random rows/requests silently fail.
+
+Unit test completed via mocking and dependency injection. 
