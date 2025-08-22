@@ -96,9 +96,4 @@ go run . --help
 # Run unit tests
 
 go test .
-```
-## Design Approach
-Go app provides a CLI interface.
-Go app connects to database - 30% of statements do not execute user-expected behavour. Instead work with random rows/requests silently fail.
-
-Unit test completed via mocking and dependency injection. 
+``` 
